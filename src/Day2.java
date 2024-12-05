@@ -1,9 +1,19 @@
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Scanner;
 
 public class Day2 {
+    private static boolean isDay2Safe(ArrayList<Integer> report) {
+        for (int i = 0; i < report.size(); i++) {
+            ArrayList<Integer> clone = (ArrayList<Integer>) report.clone();
+            clone.remove(i);
+            if ( isSafe(clone) ) return true;
+        }
+        return false;
+    }
+
     private static boolean isSafe(ArrayList<Integer> report) {
         boolean isAscending = true;
 
@@ -39,7 +49,7 @@ public class Day2 {
                 report.add(lineParser.nextInt());
             }
 
-            if ( isSafe(report) ) safeReports++;
+            if ( isDay2Safe(report) ) safeReports++;
         }
 
         System.out.println(safeReports);
