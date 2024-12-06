@@ -1,19 +1,18 @@
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Scanner;
 
 public class Day6Part2 {
     public static void main(String[] args) throws FileNotFoundException {
-        File file = new File("./Files/day6.txt");
-        Scanner scanner = new Scanner( file );
-        ArrayList<String> data = new ArrayList<String>();
-        IntVector guardPos = new IntVector(0, 0);
-        IntVector direction = new IntVector(0, -1);
-        ArrayList<IntVector> collisionPoints = new ArrayList<IntVector>();
+        IntVector ogGuardPos = new IntVector(0, 0);
         int obstacleCount = 0;
 
         // Parsing data
+        File file = new File("./Files/day6.txt");
+        Scanner scanner = new Scanner( file );
+        ArrayList<String> data = new ArrayList<String>();
         while ( scanner.hasNextLine() ) {
             data.add( scanner.nextLine() );
         }
@@ -23,70 +22,69 @@ public class Day6Part2 {
         for (int i = 0; i < data.size(); i++) {
             int guardPosIndex = data.get(i).indexOf("^");
             if ( guardPosIndex != -1 ) {
-                guardPos.x = guardPosIndex;
-                guardPos.y = i;
+                ogGuardPos.x = guardPosIndex;
+                ogGuardPos.y = i;
             }
         }
-        collisionPoints.add( guardPos );
 
-        // Travelling
-        while ( true ) {
-            IntVector next = guardPos.add( direction );
+        // Go through every combination
+        for (int y = 0; y < data.size(); y++) {
+            for (int x = 0; x < data.getFirst().length(); x++) {
+                if (data.get(y).charAt(x) == '#') continue;
 
-            // Will go out of bounds
-            if ( next.x < 0 || next.x >= length || next.y < 0 || next.y >= length ) {
-                break;
-            }
+                // For tracking collisions
+                ArrayList<IntVector> collisions = new ArrayList<IntVector>();
+                ArrayList<IntVector> collisionDirections = new ArrayList<IntVector>();
 
-            // Obstacle in front. Turn
-            if ( data.get(next.y).charAt(next.x) == '#') {
-                direction.turn(1);
-                collisionPoints.add( guardPos );
-            }
+                // Setup
+                IntVector addedObj = new IntVector(x, y);
+                IntVector direction = new IntVector(0, -1);
+                IntVector guardPos = new IntVector(ogGuardPos.x, ogGuardPos.y);
 
-            // Create obstacle in front. Finish with actually moving
-            else {
-                System.out.println("Create obstacle");
-                IntVector vObj = next;
-                IntVector vDirection = direction.turn(1);
-                IntVector vPos = guardPos;
-
-                // Keep moving virtual guard
+                // Walk through
                 while ( true ) {
-                    IntVector vNext = vPos.add( vDirection );
+                    IntVector next = guardPos.add( direction );
 
-                    if ( vNext.x < 0 || vNext.x >= length || vNext.y < 0 || vNext.y >= length ) {
+                    // Will go out of bounds
+                    if ( next.x < 0 || next.x >= length || next.y < 0 || next.y >= length )
+                    {
                         break;
                     }
 
-                    // Real obstacle in front
-                    if ( data.get(next.y).charAt(next.x) == '#' ) {
-                        if ( collisionPoints.contains( vPos ) ) {
-                            System.out.println("Found loop!");
-                            System.out.println( vObj );
-                            vDirection.turn(1);
+                    // Obstacle in front. Check if we have looped. Note collision. Turn
+                    if ( data.get(next.y).charAt(next.x) == '#' || ( next.equals(addedObj)) ) {
+
+                        // Check if we have looped
+                        boolean duplicateCollision = false;
+                        ArrayList<Integer> indexes = new ArrayList<Integer>();
+                        // // Check for all collisions on position
+                        for (int i = 0; i < collisions.size(); i++) {
+                            if (collisions.get(i).equals( guardPos ) ) indexes.add(i);
+                        }
+                        // // Check if we were facing the same way last time
+                        for (Integer number: indexes) {
+                            if ( collisionDirections.get(number).equals( direction ) ) {
+                                duplicateCollision = true;
+                                break;
+                            }
+                        }
+                        // // We've looped
+                        if ( duplicateCollision ) {
                             obstacleCount++;
                             break;
                         }
-                        else collisionPoints.add( vPos );
-                        direction.turn(1);
-                    }
 
-                    // Hit virtual wall
-                    else if ( vNext.equals( vObj ) ) {
-                        System.out.println("Found loop!");
-                        System.out.println( vObj );
-                        vDirection.turn(1);
-                        obstacleCount++;
-                        break;
+                        // Note new collision
+                        else {
+                            collisions.add( guardPos );
+                            collisionDirections.add( direction );
+                            direction = direction.turn();
+                        }
                     }
-
-                    vPos = vNext;
+                    else guardPos = next;
                 }
-
-                // Actually move the guard
-                guardPos = next;
             }
         }
+        System.out.println(obstacleCount);
     }
 }

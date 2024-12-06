@@ -47,7 +47,7 @@ public class Day6 {
 
             // Obstacle in front. Turn
             if ( data.get(nextY).charAt(nextX) == '#') {
-                IntVector rotated = new IntVector(directionX, directionY).turn(1);
+                IntVector rotated = new IntVector(directionX, directionY).turn();
                 directionX = rotated.x;
                 directionY = rotated.y;
                 collisionPoints.add( new IntVector(guardX, guardY) );

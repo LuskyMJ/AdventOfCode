@@ -6,15 +6,11 @@ public class IntVector {
         this.y = y;
     }
 
-    public IntVector turn(int amount) {
-        int xClone = x;
-        int yClone = y;
-        for (int i = 0; i < amount; i++) {
-            int tempX = x;
-            xClone = y;
-            yClone = -tempX;
-        }
-        return new IntVector(xClone, yClone);
+    public IntVector turn() {
+        if (x == 0 && y == -1) return new IntVector(1, 0);
+        else if (x == 1 && y == 0) return new IntVector(0, 1);
+        else if (x == 0 && y == 1) return new IntVector(-1, 0);
+        else return new IntVector(0, -1);
     }
 
     public int distanceTo(IntVector other) {
@@ -33,6 +29,12 @@ public class IntVector {
         }
         else if (yDiff < 0) return new IntVector(0, -1);
         else return new IntVector(0, 1);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        IntVector other = (IntVector)o;
+        return x == other.x && y == other.y;
     }
 
     public String toString() {
