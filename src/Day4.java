@@ -9,9 +9,10 @@ public class Day4 {
         int searchLength = toSearch.length;
         int lineLength;
 
+
         // Parsing file
         ArrayList<String> lines = new ArrayList<String>();
-        Scanner scanner = new Scanner( new File("./src/day4.txt") );
+        Scanner scanner = new Scanner( new File("./Files/day4.txt") );
         while ( scanner.hasNextLine() ) {
             lines.add( scanner.nextLine() );
         }
@@ -22,7 +23,7 @@ public class Day4 {
             String line = lines.get( lineY );
             for (int lineX = 0; lineX < lineLength; lineX++) {
                 // Inside specific character in set
-                if ( !line.charAt(lineX).equals('X') ) continue;
+                if ( line.charAt(lineX) != 'X' ) continue;
 
                 // Loop through all directions where we can check for wordmatch
                 for (int x = -1; x <= 1; x++) {
